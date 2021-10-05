@@ -67,7 +67,7 @@ def see_inv():
         i += 1
         fancy_type(c(f"[{i}] to exit inventory\n", "blue"), speed2, gap2)
         try:
-            inp = int(input(c(prompt, "yellow")))
+            inp = int(input(c(prompt, "magenta")))
             if inp not in range(1, i + 1):
                 fancy_type(c("\nNot a possible choice", "blue"), speed2, gap2)
             else:
@@ -180,10 +180,11 @@ def eattack(current_enemy_stats):
     for enemy in current_enemy_stats:
         atk_range = enemy[1]
         atk = random.randrange(atk_range[0], atk_range[1] + 1)
+        atk_word = random.choice(atk_words)
         if enemy[0][0] in ["a", "e", "i", "o", "u"]:
-            fancy_type(c("You got attacked by an " + enemy[0] + " for " + str(atk) + " damage", "red"), speed3, gap3)
+            fancy_type(c(f"You got {atk_word} by an {enemy[0]} for {str(atk)} damage", "red"), speed3, gap3)
         else:
-            fancy_type(c("You got attacked by a " + enemy[0] + " for " + str(atk) + " damage", "red"), speed3, gap3)
+            fancy_type(c(f"You got {atk_word} by a {enemy[0]} for {str(atk)} damage", "red"), speed3, gap3)
         add_hp(-atk)
     fancy_type(c("\nYour hp is now " + str(player_stats["hp"]), "red"), speed1, gap1)
     return player_stats["hp"]
@@ -244,11 +245,69 @@ def pattack(enemies, current_enemy_stats, run_func):
                     atk = random.randrange(atk_range[0], atk_range[1])
                 else:
                     atk = 1
+                atk_word = random.choice(atk_words)
                 current_enemy_stats[i][2] -= atk
-                fancy_type(c(f"\nYou attacked {enemy_to_compare} for {str(atk)} damage.\n", "red"), speed1, gap1)
+                fancy_type(c(f"\nYou {atk_word} {enemy_to_compare} for {str(atk)} damage.\n", "red"), speed1, gap1)
 
                 if current_enemy_stats[i][2] <= 0:
                     current_enemy_stats.pop(i)
+
+                    fancy_type(c(f"{enemy_to_compare.capitalize()} died!", "red"), speed1, gap1)
+
+                    enemy_stat = {}
+                    if isinstance(enemies[choice - 1], list):
+                        enemy_stat = enemy_stats[enemies[choice - 1][0]]
+                    elif isinstance(enemies[choice - 1], str):
+                        enemy_stat = enemy_stats[enemies[choice - 1]]
+
+                    if isinstance(enemies[choice - 1], list) and isinstance(enemies[choice - 1][1], str):
+                        if "death_message" in enemy_stat[enemies[choice - 1][1]]:
+                            death = enemy_stat[enemies[choice - 1][1]]["death_message"]
+                        else:
+                            death = enemy_stat["death_message"]
+                    else:
+                        death = enemy_stat["death_message"]
+                    fancy_type(c(random.choice(death), "red"), speed1, gap1)
+
+                    if isinstance(enemies[choice - 1], list) and isinstance(enemies[choice - 1][1], str):
+                        if "loot" in enemy_stat[enemies[choice - 1][1]]:
+                            loots = enemy_stat[enemies[choice - 1][1]]["loot"]
+                        else:
+                            loots = enemy_stat["loot"]
+                    else:
+                        loots = enemy_stat["loot"]
+
+                    list_of_loots = []
+                    for loot in loots:
+                        l1 = loots[loot][0]
+                        l2 = loots[loot][1] + 1
+                        num = random.randrange(l1, l2)
+                        list_of_loots.append([loot, num])
+
+                    loot_text = ""
+                    i = 0
+                    for loot in list_of_loots:
+                        i += 1
+                        if len(list_of_loots) == 1:
+                            loot_text += f"{str(loot[1])} {loot[0]}"
+                        else:
+                            if len(list_of_loots) == i:
+                                loot_text += f"and {str(loot[1])} {loot[0]}"
+                            elif len(list_of_loots) - 1 == i:
+                                loot_text += f"{str(loot[1])} {loot[0]} "
+                            else:
+                                loot_text += f"{str(loot[1])} {loot[0]}, "
+
+                    fancy_type(c(f"{enemy_to_compare.capitalize()} dropped {loot_text}.\n"
+                                 f"Pick loot up?", "blue"), speed1, gap1)
+                    choice2 = options(["Yes", "No"])
+                    if choice2 == 1:
+                        for loot in list_of_loots:
+                            inv_add_item(loot[0], loot[1])
+                        fancy_type(c(f"\nYou picked up {loot_text}\n", "blue"), speed1, gap1)
+                    elif choice2 == 2:
+                        fancy_type(c(f"\nYou left the loot there.\n"
+                                     f"It got trampled by the enemies.\n", "blue"), speed1, gap1)
 
                     if isinstance(enemies[choice - 1], list):
                         if len(enemies[choice - 1]) == 3:
@@ -264,7 +323,6 @@ def pattack(enemies, current_enemy_stats, run_func):
                     elif isinstance(enemies[choice - 1], str):
                         enemies.pop(choice - 1)
 
-                    fancy_type(c(f"{enemy_to_compare.capitalize()} died!\n", "red"), speed1, gap1)
                 return [current_enemy_stats, enemies]
             i += 1
 
@@ -395,16 +453,24 @@ player_stats = {
     "maxhp": 100
 }
 
-inv = [["rusty_sword", 1], ["food", 5], ["weak_healing_potion", 1], ["coins", 50]]
+inv = [["rusty_sword", 1], ["steak", 5], ["weak_healing_potion", 1], ["coins", 50]]
 equipped_items = {"weapon": "rusty_sword"}
 
-atk_words = ["dive", "leap", "swipe", "stab"]
+atk_words = ["dived at", "leaped at", "swiped at", "stabbed at", "lunged at", "attacked"]
 
 enemy_stats = {
     "unuruk": {
         "atk": [1, 2],
         "maxhp": 8,
         "plr": "unuruks",
+        "death_message": [
+            "Unuruk was carrying a box of cookies.",
+            "Unuruk was just trying to deliver some cookies."
+        ],
+        "loot": {
+            "cookies": [1, 3],
+            "coins": [3, 5]
+        },
         "-broken_leg": {
             "text": "unuruk with a broken leg",
             "textp": "unuruks with broken legs",
@@ -420,10 +486,15 @@ item_stats = {
         "slot": "weapon",
         "dmg": [7, 10]
     },
-    "food": {
+    "steak": {
         "desc": "Edible.",
         "use": True,
         "heal": 10
+    },
+    "cookies": {
+        "desc": "He just wanted to deliver them to his grandma.",
+        "use": True,
+        "heal": 5
     },
     "coins": {
         "desc": "MONEH",
@@ -442,14 +513,17 @@ option = options(["Play", "Help", "Exit"])
 
 while option != 1:
     if option == 2:
-        fancy_type(c("\nNothing here yet.", "blue"), speed1, gap1)
+        fancy_type(c("\nType a number to select a choice\n"
+                     "You probably already figured that out because you're on this screen, aren't you?\n"
+                     "Press Alt + f4 to get infinite money irl", "blue"), speed1, gap1)
     elif option == 3:
         quit()
     option = options(["Play", "Help", "Exit"])
 
 fancy_type(c("\nOnce upon a time, everyone died.\n"
              "They were all killed by a horde of monsters.\n"
-             "Only one person remains.\n"            "Guess who that person could be?\n", "blue"), speed1, gap1)
+             "Only one person remains.\n"
+             "Guess who that person could be?\n", "blue"), speed1, gap1)
 
 time.sleep(2)
 
