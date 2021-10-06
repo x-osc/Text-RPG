@@ -465,7 +465,7 @@ def fight(enemies, run_func):
 
 speed1 = 180
 gap1 = 0.28
-speed2 = 250
+speed2 = 280
 gap2 = 0.2
 speed3 = 330
 gap3 = 0.1
@@ -683,3 +683,7 @@ if option == 1:
     time.sleep(0.3)
     fancy_type(c("Honestly, you were probably expecting this.\n", "blue"), speed1, gap1)
     fight([["xaguk", 2], ["xaguk", "-sword"]], xaguk_run1)
+
+fancy_type(c("\nThe end.", "blue"), 30, gap1)
+time.sleep(0.3)
+fancy_type(c("For now...", "blue"), 30, gap1)
