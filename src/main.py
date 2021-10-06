@@ -505,7 +505,7 @@ enemy_stats = {
     },
     "xaguk": {
         "atk": [5, 7],
-        "maxhp": 18,
+        "maxhp": 20,
         "plr": "xagues",
         "death_message": [
             "Xaguk was pummeled to death",
@@ -559,7 +559,7 @@ item_stats = {
         "desc": "Makes you stronger.",
         "use": True,
         "strength": 1.4,
-        "time": 2
+        "time": 3
     },
     "strong_healing_potion": {
         "desc": "Heals you.",
@@ -665,6 +665,14 @@ def xaguk_run1(return_enemies):
     fight(return_enemies, xaguk_run1)
 
 
+def xaguk_run2(return_enemies):
+    fancy_type(c("\nThe ", "blue")
+               + c("xaguk ", "cyan")
+               + c("grabbed you.\n"
+                   "He stopped you from running away.\n", "blue"), speed1, gap1)
+    fight(return_enemies, xaguk_run2)
+
+
 if option == 1:
     fancy_type(c("\nYou got a weak healing potion, a weak strength potion, and 40 coins.", "blue"), speed1, gap1)
     inv_add_item("weak_healing_potion", 1)
@@ -677,12 +685,26 @@ if option == 1:
     fancy_type(c("You got the strong healing potion.", "blue"), speed1, gap1)
     inv_add_item("strong_healing_potion", 1)
     time.sleep(1.3)
-    fancy_type(c("\nSurprise! 3", "blue")
+    fancy_type(c("\nSurprise! 4", "blue")
                + c(" xagues ", "cyan")
                + c("leap out of a trapdoor\n", "blue"), speed2, gap1)
     time.sleep(0.3)
     fancy_type(c("Honestly, you were probably expecting this.\n", "blue"), speed1, gap1)
-    fight([["xaguk", 2], ["xaguk", "-sword"]], xaguk_run1)
+    fight([["xaguk", 3], ["xaguk", "-sword"]], xaguk_run1)
+
+elif option == 2:
+    fancy_type(c("\nYou were walking away when you saw a sword on the ground.\n"
+                 "You go to pick it up.\n", "blue"), speed1, gap1)
+
+    time.sleep(0.5)
+
+    fancy_type(c("\"Oi, where's my sword?\"\n"
+                 "A ", "blue")
+               + c("xaguk ", "cyan")
+               + c("comes up behind you.\n"
+                   "(I\'m not letting you get away without a fight.)", "blue"), speed1, gap1)
+    inv_add_item("xaguk's_sword", 1)
+    fight(["xaguk"], xaguk_run2)
 
 fancy_type(c("\nThe end.", "blue"), 30, gap1)
 time.sleep(0.3)
