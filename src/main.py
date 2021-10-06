@@ -60,9 +60,9 @@ def see_inv():
         for item in inv:
             i += 1
             if item[1] == 1:
-                fancy_type(c(f"[{i}] - {item[0]}", "yellow"), speed3, gap3)
+                fancy_type(c(f"[{i}] - {item[0]}", "yellow"), 500, 0.05)
             else:
-                fancy_type(c(f"[{i}] - {item[0]} ({item[1]})", "yellow"), speed3, gap3)
+                fancy_type(c(f"[{i}] - {item[0]} ({item[1]})", "yellow"), 500, 0.05)
         print("")
         i += 1
         fancy_type(c(f"[{i}] to exit inventory\n", "blue"), speed2, gap2)
@@ -120,7 +120,7 @@ def see_inv():
                     elif stat == "strength":
                         fancy_type(c(f"Makes your attacks {str(stats[stat])}x stronger", "blue"), speed2, gap2)
                     elif stat == "time":
-                        fancy_type(c(f"Lasts for {str(stats[stat])} seconds", "blue"), speed2, gap2)
+                        fancy_type(c(f"Lasts for {str(stats[stat])} turns", "blue"), speed2, gap2)
         elif choice == 2:
             if "equip" in stats and stats["equip"] is True:
                 slot = item_stats[item]["slot"]
@@ -146,9 +146,10 @@ def see_inv():
                     fancy_type(c(f"\nHealed up to {hp} hp", "blue"), speed1, gap1)
                 elif "strength" in stats:
                     player_stats["atk_multiplier"] = stats["strength"]
+                    player_stats["str_turn_num"] = stats["time"]
                     multiplier = stats["strength"]
                     str_time = stats["time"]
-                    fancy_type(c(f"\nMultiplying attacks by {multiplier}x for {str_time} turns", "blue"), speed1, gap1)
+                    fancy_type(c(f"\nMultiplying attacks by {str(multiplier)}x for {str(str_time)} turns", "blue"), speed1, gap1)
                 inv_add_item(item, -1)
         time.sleep(0.5)
         see_inv()
@@ -162,8 +163,12 @@ def view_stats():
     if weapon == "":
         weapon = "your fist"
     fancy_type(c(f"Your weapon is {weapon}", "blue"), speed1, gap1)
-    strength = player_stats["atk_multiplier"]
-    fancy_type(c(f"Your strength multiplier is {str(strength)}", "blue"), speed1, gap1)
+    if player_stats["atk_multiplier"] != 1.0:
+        strength = player_stats["atk_multiplier"]
+        fancy_type(c(f"Your strength multiplier is {str(strength)}", "blue"), speed1, gap1)
+    if player_stats["str_turn_num"] != 0:
+        str_turn_num = player_stats["str_turn_num"]
+        fancy_type(c(f"{str(str_turn_num)} turns left until strength wears off", "blue"), speed1, gap1)
 
 
 def options(options_in, color="yellow"):
@@ -255,6 +260,8 @@ def pattack(enemies, current_enemy_stats, run_func):
                     atk_range = item_stats[equipped_items["weapon"]]["dmg"]
                     atk = random.randrange(atk_range[0], atk_range[1])
                     atk *= player_stats["atk_multiplier"]
+                    atk = round(atk)
+                    atk = int(atk)
                 else:
                     atk = 1
                 atk_word = random.choice(atk_words)
@@ -334,6 +341,11 @@ def pattack(enemies, current_enemy_stats, run_func):
                                 enemies[choice - 1] = enemies[choice - 1][0]
                     elif isinstance(enemies[choice - 1], str):
                         enemies.pop(choice - 1)
+
+                if player_stats["str_turn_num"] != 0:
+                    player_stats["str_turn_num"] -= 1
+                    if player_stats["str_turn_num"] == 0:
+                        player_stats["atk_multiplier"] = 1.0
 
                 return [current_enemy_stats, enemies]
             i += 1
@@ -463,7 +475,8 @@ prompt = "-> "
 player_stats = {
     "hp": 100,
     "maxhp": 100,
-    "atk_multiplier": 1.0
+    "atk_multiplier": 1.0,
+    "str_turn_num": 0
 }
 
 inv = [["rusty_sword", 1], ["steak", 5], ["weak_healing_potion", 1], ["coins", 50]]
@@ -497,16 +510,21 @@ enemy_stats = {
         "death_message": [
             "Xaguk was pummeled to death",
             "Xaguk was brutally murdered",
-            "Xaguk was just trying "
+            "Xaguk was just trying to eat his dinner"
         ],
         "loot": {
-            "steak": [5, 7],
+            "steak": [4, 5],
             "coins": [10, 12]
         },
         "-sword": {
             "text": "xaguk with a sword",
             "textp": "xagues with swords",
-            "atk": [12, 14]
+            "atk": [12, 14],
+            "loot": {
+                "steak": [4, 5],
+                "coins": [10, 12],
+                "xaguk's_sword": [1, 1]
+            },
         }
     }
 }
@@ -521,12 +539,12 @@ item_stats = {
     "steak": {
         "desc": "Edible.",
         "use": True,
-        "heal": 10
+        "heal": 5
     },
     "cookies": {
         "desc": "He just wanted to deliver them to his grandma.",
         "use": True,
-        "heal": 5
+        "heal": 2
     },
     "coins": {
         "desc": "MONEH",
@@ -538,15 +556,21 @@ item_stats = {
         "heal": 30
     },
     "weak_strength_potion": {
-        "desc": "Makes you stronger",
+        "desc": "Makes you stronger.",
         "use": True,
-        "strength": 1.5,
-        "time": 5
+        "strength": 1.4,
+        "time": 2
     },
     "strong_healing_potion": {
         "desc": "Heals you.",
         "use": True,
         "heal": 100
+    },
+    "xaguk's_sword": {
+        "desc": "Was owned by a xaguk.",
+        "equip": True,
+        "slot": "weapon",
+        "dmg": [12, 14]
     }
 }
 
@@ -650,11 +674,11 @@ if option == 1:
                  "You feel like you need to take it.\n"
                  "You reach out your hand to grab it...\n", "blue"), speed1, gap1)
     time.sleep(1.2)
-    fancy_type(c("You got the strong healing potion", "blue"), speed1, gap1)
+    fancy_type(c("You got the strong healing potion.", "blue"), speed1, gap1)
     inv_add_item("strong_healing_potion", 1)
     time.sleep(1.3)
     fancy_type(c("\nSurprise! 3", "blue")
-               + c(" Jitsagnas ", "cyan")
+               + c(" xagues ", "cyan")
                + c("leap out of a trapdoor\n", "blue"), speed2, gap1)
     time.sleep(0.3)
     fancy_type(c("Honestly, you were probably expecting this.\n", "blue"), speed1, gap1)
