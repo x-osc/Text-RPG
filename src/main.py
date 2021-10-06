@@ -117,6 +117,10 @@ def see_inv():
                             fancy_type(c(f"Heals between {dmg1} and {dmg2} health", "blue"), speed2, gap2)
                         else:
                             fancy_type(c(f"Heals {stats[stat]} health", "blue"), speed2, gap2)
+                    elif stat == "strength":
+                        fancy_type(c(f"Makes your attacks {str(stats[stat])}x stronger", "blue"), speed2, gap2)
+                    elif stat == "time":
+                        fancy_type(c(f"Lasts for {str(stats[stat])} seconds", "blue"), speed2, gap2)
         elif choice == 2:
             if "equip" in stats and stats["equip"] is True:
                 slot = item_stats[item]["slot"]
@@ -140,6 +144,11 @@ def see_inv():
                     add_hp(stats["heal"])
                     hp = player_stats["hp"]
                     fancy_type(c(f"\nHealed up to {hp} hp", "blue"), speed1, gap1)
+                elif "strength" in stats:
+                    player_stats["atk_multiplier"] = stats["strength"]
+                    multiplier = stats["strength"]
+                    str_time = stats["time"]
+                    fancy_type(c(f"\nMultiplying attacks by {multiplier}x for {str_time} turns", "blue"), speed1, gap1)
                 inv_add_item(item, -1)
         time.sleep(0.5)
         see_inv()
@@ -153,6 +162,8 @@ def view_stats():
     if weapon == "":
         weapon = "your fist"
     fancy_type(c(f"Your weapon is {weapon}", "blue"), speed1, gap1)
+    strength = player_stats["atk_multiplier"]
+    fancy_type(c(f"Your strength multiplier is {str(strength)}", "blue"), speed1, gap1)
 
 
 def options(options_in, color="yellow"):
@@ -243,6 +254,7 @@ def pattack(enemies, current_enemy_stats, run_func):
                 if equipped_items["weapon"] != "":
                     atk_range = item_stats[equipped_items["weapon"]]["dmg"]
                     atk = random.randrange(atk_range[0], atk_range[1])
+                    atk *= player_stats["atk_multiplier"]
                 else:
                     atk = 1
                 atk_word = random.choice(atk_words)
@@ -439,8 +451,8 @@ def fight(enemies, run_func):
     return
 
 
-speed1 = 220
-gap1 = 0.15
+speed1 = 180
+gap1 = 0.28
 speed2 = 250
 gap2 = 0.2
 speed3 = 330
@@ -450,7 +462,8 @@ prompt = "-> "
 
 player_stats = {
     "hp": 100,
-    "maxhp": 100
+    "maxhp": 100,
+    "atk_multiplier": 1.0
 }
 
 inv = [["rusty_sword", 1], ["steak", 5], ["weak_healing_potion", 1], ["coins", 50]]
@@ -475,6 +488,25 @@ enemy_stats = {
             "text": "unuruk with a broken leg",
             "textp": "unuruks with broken legs",
             "hp": 6
+        }
+    },
+    "xaguk": {
+        "atk": [5, 7],
+        "maxhp": 18,
+        "plr": "xagues",
+        "death_message": [
+            "Xaguk was pummeled to death",
+            "Xaguk was brutally murdered",
+            "Xaguk was just trying "
+        ],
+        "loot": {
+            "steak": [5, 7],
+            "coins": [10, 12]
+        },
+        "-sword": {
+            "text": "xaguk with a sword",
+            "textp": "xagues with swords",
+            "atk": [12, 14]
         }
     }
 }
@@ -503,7 +535,18 @@ item_stats = {
     "weak_healing_potion": {
         "desc": "Heals you.",
         "use": True,
-        "heal": 50
+        "heal": 30
+    },
+    "weak_strength_potion": {
+        "desc": "Makes you stronger",
+        "use": True,
+        "strength": 1.5,
+        "time": 5
+    },
+    "strong_healing_potion": {
+        "desc": "Heals you.",
+        "use": True,
+        "heal": 100
     }
 }
 
@@ -520,18 +563,18 @@ while option != 1:
         quit()
     option = options(["Play", "Help", "Exit"])
 
-fancy_type(c("\nOnce upon a time, everyone died.\n"
-             "They were all killed by a horde of monsters.\n"
-             "Only one person remains.\n"
-             "Guess who that person could be?\n", "blue"), speed1, gap1)
+# fancy_type(c("\nOnce upon a time, everyone died.\n"
+#             "They were all killed by a horde of monsters.\n"
+#             "Only one person remains.\n"
+#             "Guess who that person could be?\n", "blue"), speed1, gap1)
 
-time.sleep(2)
+# time.sleep(1.3)
 
-fancy_type(c("You look around.\n"
-             "You have taken everything valuable from within your hut.\n", "blue")
-           + c("5 unuruks", "cyan")
-           + c(" are crowding around your house.\n"
-               "What do you do?", "blue"), speed1, gap1)
+# fancy_type(c("You look around.\n"
+#             "You have taken everything valuable from within your hut.\n", "blue")
+#           + c("5 unuruks", "cyan")
+#           + c(" are crowding around your house.\n"
+#               "What do you do?", "blue"), speed1, gap1)
 
 option = options(["Go outside", "Stay inside", "See inventory", "View your stats"])
 
@@ -579,4 +622,40 @@ def unuruk_run1(return_enemies):
         unuruk_run2(return_enemies)
 
 
-fight([["unuruk", 4], ["unuruk", "-broken_leg"]], unuruk_run1)
+# fight([["unuruk", 4], ["unuruk", "-broken_leg"]], unuruk_run1)
+
+fancy_type(c("You walked further into the forest.\n"
+             "There is a stall here.\n"
+             "Maybe its owner would have sold stuff to you in the past.\n"
+             "He's gone now.\n"
+             "What should you do?", "blue"), speed1, gap1)
+
+option = options(["Take everything", "Carry on, past the stall"])
+
+
+def xaguk_run1(return_enemies):
+    fancy_type(c("\nThe ", "blue")
+               + c("xagues ", "cyan")
+               + c("grabbed you.\n"
+                   "They stopped you from running away.\n", "blue"), speed1, gap1)
+    fight(return_enemies, xaguk_run1)
+
+
+if option == 1:
+    fancy_type(c("\nYou got a weak healing potion, a weak strength potion, and 40 coins.", "blue"), speed1, gap1)
+    inv_add_item("weak_healing_potion", 1)
+    inv_add_item("weak_strength_potion", 1)
+    inv_add_item("coins", 40)
+    fancy_type(c("There is a strong healing potion on the counter.\n"
+                 "You feel like you need to take it.\n"
+                 "You reach out your hand to grab it...\n", "blue"), speed1, gap1)
+    time.sleep(1.2)
+    fancy_type(c("You got the strong healing potion", "blue"), speed1, gap1)
+    inv_add_item("strong_healing_potion", 1)
+    time.sleep(1.3)
+    fancy_type(c("\nSurprise! 3", "blue")
+               + c(" Jitsagnas ", "cyan")
+               + c("leap out of a trapdoor\n", "blue"), speed2, gap1)
+    time.sleep(0.3)
+    fancy_type(c("Honestly, you were probably expecting this.\n", "blue"), speed1, gap1)
+    fight([["xaguk", 2], ["xaguk", "-sword"]], xaguk_run1)
