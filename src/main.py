@@ -681,14 +681,20 @@ if option == 1:
     fancy_type(c("There is a strong healing potion on the counter.\n"
                  "You feel like you need to take it.\n"
                  "You reach out your hand to grab it...\n", "blue"), speed1, gap1)
+
     time.sleep(1.2)
+    
     fancy_type(c("You got the strong healing potion.", "blue"), speed1, gap1)
     inv_add_item("strong_healing_potion", 1)
+
     time.sleep(1.3)
+
     fancy_type(c("\nSurprise! 4", "blue")
                + c(" xagues ", "cyan")
                + c("leap out of a trapdoor\n", "blue"), speed2, gap1)
+
     time.sleep(0.3)
+    
     fancy_type(c("Honestly, you were probably expecting this.\n", "blue"), speed1, gap1)
     fight([["xaguk", 3], ["xaguk", "-sword"]], xaguk_run1)
 
@@ -702,7 +708,7 @@ elif option == 2:
                  "A ", "blue")
                + c("xaguk ", "cyan")
                + c("comes up behind you.\n"
-                   "(I\'m not letting you get away without a fight.)", "blue"), speed1, gap1)
+                   "(I\'m not letting you walk away fighting at least on of these guys.)", "blue"), speed1, gap1)
     inv_add_item("xaguk's_sword", 1)
     fight(["xaguk"], xaguk_run2)
 
