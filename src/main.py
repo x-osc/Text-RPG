@@ -587,18 +587,18 @@ while option != 1:
         quit()
     option = options(["Play", "Help", "Exit"])
 
-# fancy_type(c("\nOnce upon a time, everyone died.\n"
-#             "They were all killed by a horde of monsters.\n"
-#             "Only one person remains.\n"
-#             "Guess who that person could be?\n", "blue"), speed1, gap1)
+fancy_type(c("\nOnce upon a time, everyone died.\n"
+             "They were all killed by a horde of monsters.\n"
+             "Only one person remains.\n"
+             "Guess who that person could be?\n", "blue"), speed1, gap1)
 
-# time.sleep(1.3)
+time.sleep(1.3)
 
-# fancy_type(c("You look around.\n"
-#             "You have taken everything valuable from within your hut.\n", "blue")
-#           + c("5 unuruks", "cyan")
-#           + c(" are crowding around your house.\n"
-#               "What do you do?", "blue"), speed1, gap1)
+fancy_type(c("You look around.\n"
+             "You have taken everything valuable from within your hut.\n", "blue")
+           + c("5 unuruks", "cyan")
+           + c(" are crowding around your house.\n"
+               "What do you do?", "blue"), speed1, gap1)
 
 option = options(["Go outside", "Stay inside", "See inventory", "View your stats"])
 
