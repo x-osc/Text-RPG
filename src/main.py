@@ -646,7 +646,7 @@ def unuruk_run1(return_enemies):
         unuruk_run2(return_enemies)
 
 
-# fight([["unuruk", 4], ["unuruk", "-broken_leg"]], unuruk_run1)
+fight([["unuruk", 4], ["unuruk", "-broken_leg"]], unuruk_run1)
 
 fancy_type(c("You walked further into the forest.\n"
              "There is a stall here.\n"
