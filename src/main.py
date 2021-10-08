@@ -21,11 +21,12 @@ def fancy_type(text, speed, delay):
 
 def you_died():
     fancy_type(c("\nYou died.\n"
-                 "What it says.\n"
+                 "What it says (up arrow)\n"
                  "Do you want to rage quit?", "red"), speed1, gap1)
 
-    choice = options(["respawn", "quit"])
+    choice = options(["Respawn", "Quit"])
     if choice == 1:
+        print("")
         main()
     elif choice == 2:
         quit()
@@ -640,18 +641,18 @@ def main():
             quit()
         option = options(["Play", "Help", "Exit"])
 
-    fancy_type(c("\nOnce upon a time, everyone died.\n"
-                 "They were all killed by a horde of monsters.\n"
-                 "Only one person remains.\n"
-                 "Guess who that person could be?\n", "blue"), speed1, gap1)
+    # fancy_type(c("\nOnce upon a time, everyone died.\n"
+    #             "They were all killed by a horde of monsters.\n"
+    #             "Only one person remains.\n"
+    #             "Guess who that person could be?\n", "blue"), speed1, gap1)
 
-    time.sleep(1.3)
+    # time.sleep(1.3)
 
-    fancy_type(c("You look around.\n"
-                 "You have taken everything valuable from within your hut.\n", "blue")
-               + c("5 unuruks", "cyan")
-               + c(" are crowding around your house.\n"
-                   "What do you do?", "blue"), speed1, gap1)
+    # fancy_type(c("You look around.\n"
+    #             "You have taken everything valuable from within your hut.\n", "blue")
+    #           + c("5 unuruks", "cyan")
+    #           + c(" are crowding around your house.\n"
+    #               "What do you do?", "blue"), speed1, gap1)
 
     option = options(["Go outside", "Stay inside", "See inventory", "View your stats"])
 
@@ -706,7 +707,11 @@ def main():
 
     elif option == 2:
         fancy_type(c("\nYou were walking away when you saw a sword on the ground.\n"
-                     "You go to pick it up.\n", "blue"), speed1, gap1)
+                     "You go to pick it up...\n", "blue"), speed1, gap1)
+
+        time.sleep(0.5)
+
+        fancy_type(c("You got the sword.\n", "blue"), speed1, gap1)
 
         time.sleep(0.5)
 
@@ -714,15 +719,20 @@ def main():
                      "A ", "blue")
                    + c("xaguk ", "cyan")
                    + c("comes up behind you.\n"
-                       "(I\'m not letting you walk away fighting at least on of these guys.)", "blue"), speed1, gap1)
+                       "(I\'m not letting you walk away without fighting at least one of these guys.)\n", "blue"), speed1, gap1)
         inv_add_item("xaguk's_sword", 1)
         fight(["xaguk"], xaguk_run2)
 
     fancy_type(c("\nThe end.", "blue"), 30, gap1)
     time.sleep(0.3)
-    fancy_type(c("For now...\n", "blue"), 30, gap1)
+    fancy_type(c("For now...", "blue"), 30, gap1)
     time.sleep(2)
-    main()
+    option = options(["Replay", "Quit"])
+    if option == 1:
+        print("\n")
+        main()
+    elif option == 2:
+        quit()
 
 
 if __name__ == '__main__':
