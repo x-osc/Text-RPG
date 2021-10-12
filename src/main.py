@@ -26,7 +26,11 @@ def you_died():
 
     choice = options(["Respawn", "Quit"])
     if choice == 1:
+        global inv
+        global equipped_items
         print("")
+        inv = [["rusty_sword", 1], ["steak", 5], ["weak_healing_potion", 1], ["coins", 50]]
+        equipped_items = {"weapon": "rusty_sword"}
         main()
     elif choice == 2:
         quit()
